@@ -1,41 +1,39 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# AGENTS.md — Pomodoro Academia Cotopaxi
 
-## Expo has changed — do not trust your training data
+App móvil offline para el colegio "Academia Cotopaxi" (Pomodoro). Proyecto didáctico, sin anuncios/registro/backend.
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
+## Stack
+- Expo ~57, React 19.2.3, React Native 0.86.3, TypeScript ~6 (strict). Entry: `expo-router/entry` (file-based routing).
+- Aliases: `@/*` -> `./src/*`, `@/assets/*` -> `./assets/*` (ver `tsconfig.json`).
+- Persistencia local con `@react-native-async-storage/async-storage` cuando se implemente.
 
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+## Estructura real
+Expo Router: las rutas están actualmente en src/app/. No crear una segunda carpeta app/ en la raíz ni mover rutas sin una tarea aprobada que lo requiera.
+src/domain/: lógica de negocio pura, sin React ni AsyncStorage.
+src/storage/: persistencia local.
+Pruebas junto al módulo que prueban, usando __tests__/ o archivos *.test.ts(x), según la convención definida para la tarea.
+La estructura puede evolucionar mediante tareas aprobadas; no crear carpetas anticipadamente sin necesidad.
 
-## Commands
+## Comandos (verificados)
+- Instalar: `npm install`
+- Dev: `npx expo start` (red bloqueada: `npx expo start --tunnel`). Plataformas: `npm run android|ios|web`
+- Lint: `npm run lint` (usa `expo lint`)
+- Tipos: `npx tsc --noEmit`
+- Tests: `npx jest` o `npx jest --preset jest-expo` (Jest 30, `jest-expo`). Con PowerShell usar `npx.cmd`. No hay script `test` en `package.json`.
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
+## Convenciones
+- Código/nombres en inglés; textos de interfaz/comentarios en español.
+- Reglas Pomodoro/timer: fuente de verdad en skill `pomodoro-rules`. Decisiones/validación en `specs/NNN-*/decisiones.md`.
+- Marca/contraste: skill `cotopaxi-brand`. Trampas RN: skill `rn-conventions`.
+- Antes de tocar código lee `docs/constitution.md` y la spec activa `specs/NNN-*/`.
+- Muestra plan, una tarea por vez. Pregunta si hay duda.
+- Pruebas primero para lógica; textos en español.
+- Pregunta antes: instalar dependencias, crear archivos fuera del plan, cambiar formato de datos guardados.
+- Nunca reemplazar archivos existentes sin que la tarea lo pida, ni guardar datos sensibles.
 
-```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
-```
+## Memoria
+- Al empezar lee `MEMORY.md`. Al terminar fase/tarea actualiza solo "Estado actual" y "Próximos pasos" (con siguiente `/sdd-*`).
+- No copies decisiones/contenido de specs a `MEMORY.md`; remite a `specs/NNN-*/decisiones.md`. Sin detalles de implementación. Máx ~50 líneas.
 
-Run lint and typecheck before declaring any task done.
-
-## Navigation & Routing
-
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
-
-## Building with EAS
-
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
-
-## Rules
-
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+## Verificación
+- Lógica: `npx jest` en verde. Interfaz: lista manual en Expo Go/dispositivo según tarea.
