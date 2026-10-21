@@ -1,4 +1,4 @@
-name: sdd
+name: spec-sdd
 description: Úsala siempre que trabajes con Spec-Driven Development en este proyecto (docs/constitution.md, docs/historias/ o cualquier archivo de specs/): redactar, revisar o cambiar specs, planes y tareas, o implementar y validar tareas de una spec.
 
 # Spec-Driven Development (SDD)

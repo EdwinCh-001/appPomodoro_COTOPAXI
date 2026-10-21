@@ -1,12 +1,13 @@
-# Tareas — Spec 001: Temporizador de Estudio
+# Tareas — Spec 001 Temporizador
 
-- [ ] **T1. Crear tipos y estructura base de dominio del temporizador.**
-  - Hecho cuando: `src/domain/timer.ts` compila sin errores (`npx tsc --noEmit`).
-- [ ] **T2. Escribir pruebas unitarias en Jest (en rojo) para inicio, pausa y reanudación.**
-  - Hecho cuando: `src/domain/__tests__/timer.test.ts` implementa las pruebas base.
-- [ ] **T3. Implementar funciones puras en dominio y pasar pruebas a verde.**
-  - Hecho cuando: `npx jest` pasa de forma exitosa.
-- [ ] **T4. Desarrollar la interfaz visual del temporizador en la pantalla principal.**
-  - Hecho cuando: `src/app/index.tsx` muestra el contador y controles bajo `cotopaxi-brand`.
-- [ ] **T5. Verificación final de la spec.**
-  - Hecho cuando: Pruebas unitarias en verde y validación manual completada.
+Orden de dependencia. Una tarea cada vez: pruebas en rojo → código → `npx jest` en verde → marcar y parar. Si la tarea toca la interfaz, entregar la lista manual de verificación y esperar la confirmación del usuario en Expo Go antes de marcarla.
+
+- [x] **T1. Funciones puras del temporizador con pruebas.** Crear `src/domain/timer.ts` y `src/domain/format.ts` con sus pruebas en rojo primero. RF-1, RF-2, RF-3, RF-4, RF-6, RF-7, RF-9, RNF-1 — *Hecho 2026-10-19: `npx jest --preset jest-expo src/domain` → 14/14 en verde (crear fase, restante por diferencia de fechas, pausar congela exacto, reanudar reprograma, reiniciar no toca pomodoros, fin a cero, `formatTime`). Se añadió `"types": ["jest"]` al `tsconfig.json` para que `tsc` reconozca los tipos de Jest (verificado: `tsc` exit 0).*
+  - Hecho cuando: `npx jest` en verde cubriendo: crear fase, restante por diferencia de fechas (incluido bloqueo simulado con reloj), pausar congela exacto, reanudar reprograma, reiniciar no toca pomodoros, fin a cero y `formatTime`.
+- [x] **T2. Hook `useTimer`.** Estado del timer en la interfaz con tick por diferencia de fechas; expone `start/pause/resume/reset`; sin persistencia todavía. RF-1, RF-3, RF-4, RF-9 — *Hecho 2026-10-20: `src/hooks/useTimer.ts` creado; delega todas las transiciones en `src/domain/timer.ts` (sin lógica duplicada), tick cada 250 ms recalculando por `computeRemaining`/`isDone`, guards para iniciar dos veces y reiniciar en `ready`. Verificado: `tsc` exit 0, `jest --preset jest-expo` 14/14, `expo lint` sin errores (quedó un warning preexistente en `_layout.tsx`).*
+  - Hecho cuando: el hook compila sin errores de tipos y su lógica de transiciones está cubierta por las pruebas de T1 (no duplica lógica de dominio).
+- [x] **T3. Pantalla principal con controles.** Reescribir `src/app/index.tsx` + `TimerDisplay` + `TimerControls` con paleta Cotopaxi, `mm:ss`, confirmación `Alert` al reiniciar, etiquetas de accesibilidad y safe area. RF-5, RF-8, RNF-3, RNF-4 — *Hecho 2026-10-20: `src/components/TimerDisplay.tsx` y `TimerControls.tsx` creados y `src/app/index.tsx` reescrito; paleta centralizada en `src/theme/colors.ts`; `src/app/explore.tsx` (vacío y sin referencias) eliminado con aprobación del usuario. Verificado por el usuario en Expo Go: pausar/reanudar y reiniciar correctos, la cuenta arranca solo al confirmar el reinicio y el tiempo se recalcula exacto al volver de un bloqueo (`tsc` exit 0, `jest --preset jest-expo` 14/14, `expo lint` 0 errores).*
+  - Hecho cuando: en Expo Go se ve el tiempo corriendo, pausar/reanudar conserva el tiempo, reiniciar pide confirmación, cancelar no altera nada y el teclado/barras no tapan nada (lista de `rn-conventions`).
+- [x] **T4. Verificación de cierre de la spec.** `npx jest`, `npx tsc --noEmit`, `npm run lint` en verde y lista manual de `rn-conventions` + checklist de `pomodoro-rules` (puntos aplicables a esta spec) ejecutados por el usuario. RF-1..RF-9 — *Hecho 2026-10-20: `tsc` exit 0, `jest --preset jest-expo` 14/14, `expo lint` exit 0 (0 errores, 1 warning preexistente en `_layout.tsx`). Lista manual de `rn-conventions` y checklist de `pomodoro-rules` ejecutados y confirmados por el usuario en Expo Go.*
+  - Hecho cuando: los tres comandos pasan y el usuario confirma en Expo Go la lista manual; se marca la spec como `implementada` solo con su aprobación.
+  - **Pendiente para una spec/tarea futura (no forma parte de este cierre):** alinear la identidad visual de la app con la paleta Cotopaxi fuera de la pantalla del temporizador — `app.json` conserva `"orientation": "portrait"` y el splash/íconos usan colores de plantilla (`#208AEF`, `#E6F4FE`). Detectado al cerrar T4 (2026-10-20); requiere spec propia o enmienda con aprobación del usuario.

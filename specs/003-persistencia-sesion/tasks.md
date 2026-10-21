@@ -1,12 +1,12 @@
-# Tareas — Spec 003: Persistencia y Conteo en Segundo Plano
+# Tareas — Spec 003 Persistencia de la sesión
 
-- [ ] **T1. Crear funciones puras de cálculo temporal por timestamps en dominio.**
-  - Hecho cuando: `src/domain/timer-sync.ts` compila correctamente sin errores de TypeScript (`npx tsc --noEmit`).
-- [ ] **T2. Escribir pruebas unitarias en Jest para simular el paso del tiempo con bloqueos y cierres.**
-  - Hecho cuando: `src/domain/__tests__/timer-sync.test.ts` pasa todas sus pruebas en verde (`npx jest`).
-- [ ] **T3. Implementar el módulo de almacenamiento local con AsyncStorage para el temporizador.**
-  - Hecho cuando: Las funciones de guardado y carga operan sin errores de tipo.
-- [ ] **T4. Conectar la sincronización temporal con el ciclo de vida de la app en la interfaz principal.**
-  - Hecho cuando: `src/app/index.tsx` actualiza el contador automáticamente al volver a primer plano.
-- [ ] **T5. Verificación final de la spec.**
-  - Hecho cuando: Pruebas unitarias en verde y validación manual completada.
+Depende de las specs 001 y 002. Una tarea cada vez: pruebas en rojo → código → `npx jest` en verde → parar.
+
+- [x] **T1. Reconciliación pura con pruebas.** Crear `src/domain/reconcile.ts` y sus pruebas en rojo: sin datos, fin futuro (bloqueo), fin pasado (transición pendiente + aviso pendiente), pausado intacto, versión desconocida, conservación del contador. RF-2, RF-3, RF-4, RF-5, RF-6, RF-8, RNF-1 — *Hecho 2026-10-20: `src/domain/reconcile.ts` (puro) con `reconcile`, `toSnapshot`, `DEFAULT_DURATIONS`, `SNAPSHOT_SCHEMA_VERSION`; 8 pruebas en `reconcile.test.ts` + 5 de flujo en `persistenceFlow.test.ts`, todas en verde.*
+  - Hecho cuando: `npx jest` en verde con los 6 grupos de pruebas del plan.
+- [x] **T2. Módulo de snapshot con pruebas.** Crear `src/storage/sessionSnapshot.ts` (clave `session@v1`, `schemaVersion`, guardado/carga con validación y fallback) con AsyncStorage mockeado. RF-1, RF-6, RF-7, RF-8 — *Hecho 2026-10-20: `src/storage/sessionSnapshot.ts` con `saveSnapshot`, `loadSnapshot`, `clearSnapshot`; valida la forma del objeto y nunca lanza (devuelve `null`). 9 pruebas con AsyncStorage mockeado en verde.*
+  - Hecho cuando: las pruebas cubren guardar→cargar idéntico, JSON corrupto → defaults sin lanzar y rechazo de versiones desconocidas.
+- [x] **T3. Integración en `useTimer`.** Arranque: cargar → reconciliar → render → persistir estado reconciliado. Uso: persistir en cada transición y en el tick. RF-1, RF-2, RF-3, RF-4, RF-7, RNF-2 — *Hecho 2026-10-20: `useTimer` hidrata con `loadSnapshot` → `reconcile` → `saveSnapshot`, expone `ready` y `pendingNotice`/`clearPendingNotice`; persiste en cada transición y como máximo 1 vez/s durante la cuenta (el tick es de 250 ms). `index.tsx` avisa con `Alert` si venció una fase con la app cerrada (puente a la spec 004). `tsc` exit 0, 64/64 pruebas, `lint` limpio.*
+  - Hecho cuando: en Expo Go, bloquear/desbloquear y cerrar desde apps recientes muestran el tiempo correcto, y el aviso de fin pendiente se entrega al reabrir.
+- [x] **T4. Verificación de cierre.** Lista manual en Expo Go ejecutada por el usuario (bloquear, cerrar desde recientes, vencido con app cerrada, pausado y cerrado, primera ejecución) + `npx jest`, `npx tsc --noEmit`, `npm run lint` en verde + checklist `pomodoro-rules` (cálculo con timestamps). RF-1..RF-8 — *Hecho 2026-10-20: `tsc` exit 0, `jest --preset jest-expo` 64/64, `expo lint` 0 problemas. Los 5 escenarios manuales confirmados por el usuario en Expo Go (bloquear, cerrar desde recientes, vencido con app cerrada, pausado y cerrado, primera ejecución). **Spec 003 marcada como `implementada`.***
+  - Hecho cuando: comandos en verde y el usuario confirma los 5 escenarios manuales; la spec pasa a `implementada` solo con su aprobación.
